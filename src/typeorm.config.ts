@@ -6,8 +6,6 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 const configService = new ConfigService();
 
-console.log({ processEnvNodeEnv: process.env.NODE_ENV });
-
 // TODO use secrets (if possible) instead of env
 export const getTypeormConfig = (configService: ConfigService) =>
   ({
@@ -17,7 +15,7 @@ export const getTypeormConfig = (configService: ConfigService) =>
     password: configService.get('DATABASE_PASSWORD'),
     port: +configService.get('DATABASE_PORT'),
     entities: ['dist/**/*.entity.js'],
-    migrations: ['dist/migrations/*.ts'],
+    migrations: ['dist/migrations/*.js'],
   } as TypeOrmModuleOptions);
 
 export default new DataSource(

@@ -12,7 +12,7 @@ export class Proverb {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   igbo: string;
 
   @Column()
@@ -26,7 +26,4 @@ export class Proverb {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date;
 }

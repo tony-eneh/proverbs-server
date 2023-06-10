@@ -6,6 +6,12 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "typeorm:schema:sync": "yarn build && npx typeorm schema:sync -d dist/typeorm.config.js",
+    "typeorm:migration:run": "yarn build && npx typeorm migration:run -d dist/typeorm.config.js",
+    "typeorm:migration:generate": "yarn build && npx typeorm migration:generate src/migrations/my-migration -d dist/typeorm.config.js",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose rm -f -s -v",
+    "docker:rs": "yarn docker:down && yarn docker:up && sleep 1 && yarn typeorm:migration:run",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -21,10 +27,18 @@
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/typeorm": "^9.0.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "dotenv": "^16.1.4",
+    "pg": "^8.11.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "typeorm": "^0.3.16"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

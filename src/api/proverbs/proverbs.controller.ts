@@ -11,8 +11,9 @@ import {
 import { ProverbsService } from './proverbs.service';
 import { CreateProverbDto } from './dto/create-proverb.dto';
 import { UpdateProverbDto } from './dto/update-proverb.dto';
+import { FindProverbsDto } from './dto/find-proverb.dto';
 
-@Controller('api/proverbs')
+@Controller('proverbs')
 export class ProverbsController {
   constructor(private readonly proverbsService: ProverbsService) {}
 
@@ -22,7 +23,7 @@ export class ProverbsController {
   }
 
   @Get()
-  findAll(@Query() query) {
+  findAll(@Query() query: FindProverbsDto) {
     return this.proverbsService.findAll(query);
   }
 

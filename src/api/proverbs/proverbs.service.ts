@@ -8,11 +8,8 @@ import { UpdateProverbDto } from './dto/update-proverb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Proverb } from './entities/proverb.entity';
 import { ILike, Repository } from 'typeorm';
-import {
-  DEFAULT_PAGE_NO,
-  DEFAULT_PAGE_SIZE,
-  ProverbsQuery,
-} from './proverbs.model';
+import { DEFAULT_PAGE_SIZE } from 'src/constants';
+import { FindProverbsDto } from './dto/find-proverb.dto';
 
 @Injectable()
 export class ProverbsService {
@@ -34,8 +31,8 @@ export class ProverbsService {
   }
 
   // TODO use an interceptor to always format the output in particular way
-  findAll({ filter, pageNumber, pageSize }: ProverbsQuery) {
-    pageNumber = pageNumber || DEFAULT_PAGE_NO;
+  findAll({ filter, pageNumber, pageSize }: FindProverbsDto) {
+    pageNumber = pageNumber || 1;
     pageSize = pageSize || DEFAULT_PAGE_SIZE;
     filter = (filter || '').normalize('NFKD');
 

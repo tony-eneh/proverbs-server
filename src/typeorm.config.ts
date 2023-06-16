@@ -16,6 +16,7 @@ export const getTypeormConfig = (configService: ConfigService) =>
     port: +configService.get('DATABASE_PORT'),
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/migrations/*.js'],
+    synchronize: configService.get('NODE_ENV') === 'development',
   } as TypeOrmModuleOptions);
 
 export default new DataSource(

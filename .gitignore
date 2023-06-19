@@ -36,3 +36,5 @@ lerna-debug.log*
 
 # postman-like in-editor-request-maker
 requests.rest
+
+.env

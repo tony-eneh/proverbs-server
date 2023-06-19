@@ -6,6 +6,8 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Get,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
@@ -32,5 +34,12 @@ export class AuthController {
   @Delete('logout/:id')
   logout(@Param('id') id: string) {
     return this.authService.logout(+id);
+  }
+
+  // get new access token using refresh token
+  @PublicRoute()
+  @Get('token')
+  refreshAccessToken(@Req() req) {
+    return this.authService.refreshAccessToken(req);
   }
 }

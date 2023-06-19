@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+import { extractJwtFromRequest } from 'src/helpers';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
 
     // it's a protected route, so verify jwt
     const request = context.switchToHttp().getRequest();
-    const jwt = this.extractJwtFromRequest(request);
+    const jwt = extractJwtFromRequest(request);
 
     try {
       const user = await this.jwtService.verify(jwt);
@@ -33,12 +33,5 @@ export class AuthGuard implements CanActivate {
     }
 
     return true;
-  }
-
-  extractJwtFromRequest(request: Request) {
-    const [type, jwt] = request.headers.authorization?.split(' ') ?? [];
-    if (type !== 'Bearer' || !jwt) throw new UnauthorizedException();
-
-    return jwt;
   }
 }

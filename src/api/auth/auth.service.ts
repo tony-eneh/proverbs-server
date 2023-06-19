@@ -9,6 +9,8 @@ import { UserService } from '../user/user.service';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
+import { extractJwtFromRequest } from 'src/helpers';
 
 @Injectable()
 export class AuthService {
@@ -74,5 +76,35 @@ export class AuthService {
 
   logout(id: number) {
     return `Successfully logged out ${id}`;
+  }
+
+  async refreshAccessToken(req: Request) {
+    let user;
+    let payload;
+
+    const refreshToken = extractJwtFromRequest(req);
+    // verify validity of refresh token using jwtService
+    try {
+      user = await this.jwtService.verify(refreshToken, {
+        secret: this.configService.get('REFRESH_TOKEN_SECRET'),
+      });
+      req['user'] = user;
+    } catch (err) {
+      throw new UnauthorizedException();
+    }
+
+    // TODO Verify user has not logged out. Check redis store if logout date of user is less than refresh token iat
+
+    // sign user with access secret and return access-token, refresh_token and user
+    payload = {
+      sub: user.id,
+      email: user.email,
+    };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+      refresh_token: refreshToken,
+      user,
+    };
   }
 }

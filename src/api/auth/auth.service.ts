@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private logger: Logger,
   ) {}
   signup(signupDto: SignupDto) {
     return this.userService.create(signupDto);
@@ -60,9 +62,13 @@ export class AuthService {
       sub: user.id,
       email: user.email,
     };
-    const access_token = await this.jwtService.signAsync(payload); // uses the default secret set during JwtModule registration
+    const access_token = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+      expiresIn: '15m',
+    });
     const refresh_token = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('REFRESH_TOKEN_SECRET'),
+      expiresIn: '1h',
     });
     delete user.passwordHash;
 
@@ -74,13 +80,17 @@ export class AuthService {
     };
   }
 
-  logout(id: number) {
-    return `Successfully logged out ${id}`;
+  logout(req: Request) {
+    // get the user cred from the request object
+    const user = req['user'];
+    // update the redis store. set current timestamp as logout time
+    req.session[`lastLogout-${user.email}`] = Math.floor(Date.now() / 1000);
+
+    return { message: 'Successfully logged out' };
   }
 
   async refreshAccessToken(req: Request) {
     let user;
-    let payload;
 
     const refreshToken = extractJwtFromRequest(req);
     // verify validity of refresh token using jwtService
@@ -90,19 +100,28 @@ export class AuthService {
       });
       req['user'] = user;
     } catch (err) {
+      this.logger.error(err);
       throw new UnauthorizedException();
     }
 
-    // TODO Verify user has not logged out. Check redis store if logout date of user is less than refresh token iat
+    // Verify user has not logged out. Check redis store if logout date of user is less than refresh token iat
+    if (
+      req.session[`lastLogout-${user.email}`] &&
+      req.session[`lastLogout-${user.email}`] >= user.iat
+    )
+      throw new UnauthorizedException();
 
-    // sign user with access secret and return access-token, refresh_token and user
-    payload = {
+    // sign user with access secret and return access_token, refresh_token and user
+    const payload = {
       sub: user.id,
       email: user.email,
     };
 
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(payload, {
+        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+        expiresIn: '15m',
+      }),
       refresh_token: refreshToken,
       user,
     };

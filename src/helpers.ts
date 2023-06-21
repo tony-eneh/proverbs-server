@@ -1,4 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { Repository } from 'typeorm';
 
@@ -14,4 +15,12 @@ export function extractJwtFromRequest(request: Request) {
   if (type !== 'Bearer' || !jwt) throw new UnauthorizedException();
 
   return jwt;
+}
+
+export function isProductionEnv(configService: ConfigService) {
+  return configService.get('NODE_ENV') === 'production';
+}
+
+export function isDevelopmentEnv(configService: ConfigService) {
+  return configService.get('NODE_ENV') === 'development';
 }

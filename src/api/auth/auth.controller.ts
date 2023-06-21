@@ -31,9 +31,9 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Delete('logout/:id')
-  logout(@Param('id') id: string) {
-    return this.authService.logout(+id);
+  @Delete('logout')
+  logout(@Req() req) {
+    return this.authService.logout(req);
   }
 
   // get new access token using refresh token

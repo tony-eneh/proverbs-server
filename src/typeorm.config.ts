@@ -10,10 +10,11 @@ const configService = new ConfigService();
 export const getTypeormConfig = (configService: ConfigService) =>
   ({
     type: 'postgres',
-    database: configService.get('DATABASE_NAME'),
-    username: configService.get('DATABASE_USERNAME'),
-    password: configService.get('DATABASE_PASSWORD'),
-    port: +configService.get('DATABASE_PORT'),
+    host: configService.get('DATABASE_HOST'),
+    database: configService.get('POSTGRES_DB'),
+    username: configService.get('POSTGRES_USER'),
+    password: configService.get('POSTGRES_PASSWORD'),
+    port: +configService.get('POSTGRES_PORT'),
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/migrations/*.js'],
     synchronize: configService.get('NODE_ENV') === 'development',

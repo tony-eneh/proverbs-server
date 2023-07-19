@@ -1,26 +1,41 @@
 version: '3.8'
 services:
-  proverbs-service:
+  postgres:
+    hostname: postgres
     image: postgres:13
     ports:
-      - 5434:5432
-    environment:
-      # TODO setup secrets/env instead of hardcoded credentials
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
+      - 5432:5432
+    env_file: .env # TODO setup secrets instead of .env credentials
     networks:
       - idah
-  proverbs-service-redis-session-store:
+  redis-store:
+    hostname: redis-store
     image: redis:6.0
     ports:
       - 6379:6379
-  proverbs-service-redis-commander:
+    networks:
+      - idah
+  redis-commander:
     hostname: redis-commander
     image: ghcr.io/joeferner/redis-commander:latest
     environment:
-      - REDIS_HOSTS=local:proverbs-service-redis-session-store:6379
+      - REDIS_HOSTS=local:redis-store:6379
     ports:
       - '8081:8081'
+    networks:
+      - idah
+  main-app:
+    build: .
+    depends_on:
+      - postgres
+      - redis-store
+    ports:
+      - '3000:3000'
+    env_file: .env
+    environment:
+      DATABASE_HOST: postgres
+      REDIS_HOST: redis-store
+    networks:
+      - idah
 networks:
   idah:

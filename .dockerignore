@@ -1,0 +1,6 @@
+node_modules
+dist
+.vscode
+requests.rest
+.prettier*
+.env

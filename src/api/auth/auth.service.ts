@@ -21,8 +21,11 @@ export class AuthService {
     private configService: ConfigService,
     private logger: Logger,
   ) {}
-  signup(signupDto: SignupDto) {
-    return this.userService.create(signupDto);
+  async signup(signupDto: SignupDto) {
+    const user = await this.userService.create(signupDto);
+    delete user.passwordHash;
+
+    return user;
   }
 
   async login(loginDto: LoginDto) {

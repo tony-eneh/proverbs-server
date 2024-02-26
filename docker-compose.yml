@@ -1,22 +1,22 @@
 version: '3.8'
 services:
   postgres:
-    hostname: postgres
-    image: postgres:13
+    container_name: postgres
+    image: public.ecr.aws/docker/library/postgres:13.11-bullseye
     ports:
       - 5432:5432
     env_file: .env # TODO setup secrets instead of .env credentials
     networks:
       - idah
   redis-store:
-    hostname: redis-store
-    image: redis:6.0
+    container_name: redis-store
+    image: public.ecr.aws/docker/library/redis:6.0.20-bookworm
     ports:
       - 6379:6379
     networks:
       - idah
   redis-commander:
-    hostname: redis-commander
+    container_name: redis-commander
     image: ghcr.io/joeferner/redis-commander:latest
     environment:
       - REDIS_HOSTS=local:redis-store:6379
@@ -25,7 +25,8 @@ services:
     networks:
       - idah
   main-app:
-    build: .
+    container_name: my-proverbs-server
+    image: public.ecr.aws/g0f3d0b7/igbo/proverbs-server
     depends_on:
       - postgres
       - redis-store
